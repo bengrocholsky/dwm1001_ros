@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find localizer_dwm1001)/launch/log_dwm.launch" />
+  <include file="$(find localizer_dwm1001)/launch/log_px4.launch" />
+</launch>
