@@ -17,6 +17,7 @@ from dynamic_reconfigure.server     import Server
 from localizer_dwm1001.cfg          import DWM1001_Tune_SerialConfig
 from localizer_dwm1001.msg          import Anchor
 from localizer_dwm1001.msg          import Tag
+from localizer_dwm1001.msg          import Anchors
 from localizer_dwm1001.srv         import Anchor_0
 
 
@@ -25,10 +26,10 @@ from localizer_dwm1001.srv         import Anchor_0
 rospy.init_node('Localizer_DWM1001', anonymous=False)
 
 # allow serial port to be detected by user
-os.popen("sudo chmod 777 /dev/ttyACM0", "w")
+#os.popen("sudo chmod 777 /dev/ttyACM0", "w")
 
 # initialize ros rate 10hz
-rate = rospy.Rate(1)
+rate = rospy.Rate(10)  # not used as this is driven by blocking canonical serial reads
 
 serialReadLine = ""
 # For dynamic configuration
@@ -62,6 +63,9 @@ class dwm1001_localizer:
         """
 
         global serialReadLine
+        global readTime
+        global pub
+        pub = rospy.Publisher('/dwm1001/anchors', Anchors, queue_size=1)
 
         #TODO implemnt functionality dynamic configuration
         #updateDynamicConfiguration_SERIALPORT()
@@ -90,15 +94,16 @@ class dwm1001_localizer:
 
             while not rospy.is_shutdown():
                 # just read everything from serial port
-                serialReadLine = serialPortDWM1001.read_until()
+                serialReadLine = serialPortDWM1001.read_until().decode('utf-8')
+                readTime = rospy.Time.now()
+                print(serialReadLine)
+                print(len(serialReadLine))
 
                 try:
                     self.pubblishCoordinatesIntoTopics(self.splitByComma(serialReadLine))
 
                 except IndexError:
                     rospy.loginfo("Found index error in the network array!DO SOMETHING!")
-
-
 
         except KeyboardInterrupt:
             rospy.loginfo("Quitting DWM1001 Shell Mode and closing port, allow 1 second for UWB recovery")
@@ -139,6 +144,9 @@ class dwm1001_localizer:
 
         """
 
+        msg = Anchors()
+        msg.header.stamp = readTime
+
         # loop trough the array given by the serial port
         for network in networkDataArray:
 
@@ -155,8 +163,8 @@ class dwm1001_localizer:
 
                 # publish each anchor, add anchor number to the topic, so we can pubblish multiple anchors
                 # example /dwm1001/anchor0, the last digit is taken from AN0 and so on
-                pub_anchor = rospy.Publisher('/dwm1001/anchor'+str(temp_anchor_number[-1]), Anchor, queue_size=1)
-                pub_anchor.publish(anchor)
+                #pub_anchor = rospy.Publisher('/dwm1001/anchor'+str(temp_anchor_number[-1]), Anchor, queue_size=1)
+                #pub_anchor.publish(anchor)
                 rospy.loginfo("Anchor: "
                               + str(anchor.id)
                               + " x: "
@@ -165,6 +173,7 @@ class dwm1001_localizer:
                               + str(anchor.y)
                               + " z: "
                               + str(anchor.z))
+                msg.anchors.append(anchor)  # seems simpler to have one topic that has all anchors in an array with a time stamp
 
             elif 'POS' in network:
 
@@ -185,7 +194,7 @@ class dwm1001_localizer:
                               + " z: "
                               + str(tag.z))
 
-
+        pub.publish(msg)
 
 
 
