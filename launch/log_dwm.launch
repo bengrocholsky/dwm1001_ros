@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="rosbag" type="record" name="rosbag_record_dwm"
+  args="-O /data/current/dwm.bag --split --size=2048
+/diagnostics
+/dwm1001/anchors
+"/>
+</launch>
