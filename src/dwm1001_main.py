@@ -96,8 +96,8 @@ class dwm1001_localizer:
                 # just read everything from serial port
                 serialReadLine = serialPortDWM1001.read_until().decode('utf-8')
                 readTime = rospy.Time.now()
-                print(serialReadLine)
-                print(len(serialReadLine))
+                #print(serialReadLine)
+                #print(len(serialReadLine))
 
                 try:
                     self.pubblishCoordinatesIntoTopics(self.splitByComma(serialReadLine))
@@ -172,7 +172,9 @@ class dwm1001_localizer:
                               + " y: "
                               + str(anchor.y)
                               + " z: "
-                              + str(anchor.z))
+                              + str(anchor.z)
+                              + " d: " 
+                              + str(anchor.distanceFromTag))
                 msg.anchors.append(anchor)  # seems simpler to have one topic that has all anchors in an array with a time stamp
 
             elif 'POS' in network:
@@ -241,18 +243,15 @@ class dwm1001_localizer:
         :returns: none
 
         """
-        # reset incase previuos run didn't close properly
+        # reset incase previous run didn't close properly
         serialPortDWM1001.write(DWM1001_API_COMMANDS.RESET)
-        # send ENTER two times in order to access api
+        # send ENTER to actually engage the command
         serialPortDWM1001.write(DWM1001_API_COMMANDS.SINGLE_ENTER)
-        # sleep for half a second
+        # sleep for 2 seconds to allow the system to reboot
+        time.sleep(2.0)
+        # double enter to engage console api
+        serialPortDWM1001.write(DWM1001_API_COMMANDS.DOUBLE_ENTER)
         time.sleep(0.5)
-        serialPortDWM1001.write(DWM1001_API_COMMANDS.SINGLE_ENTER)
-        # sleep for half second
-        time.sleep(0.5)
-        # send a third one - just in case
-        serialPortDWM1001.write(DWM1001_API_COMMANDS.SINGLE_ENTER)
-
 
     def callbackDynamicConfig(self, config, level):
         """
