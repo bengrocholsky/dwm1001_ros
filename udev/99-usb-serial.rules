@@ -18,4 +18,5 @@ SUBSYSTEM=="tty", ATTRS{serial}=="A50285BI", SYMLINK+="ttyUSB_pri_uart2"
 SUBSYSTEM=="tty", ATTRS{serial}=="A506YV7G", SYMLINK+="ttyUSB_n380_com1"
 SUBSYSTEM=="tty", ATTRS{serial}=="1084d1ca82e7ea11902292c2994a5d01", SYMLINK+="ttyUSB_n380_com2" 
 SUBSYSTEM=="tty", ATTRS{serial}=="000760006659", SYMLINK+="ttyACM_dwm"
+SUBSYSTEM=="tty", ATTRS{serial}=="000760006586", SYMLINK+="ttyACM_dwm"
 
