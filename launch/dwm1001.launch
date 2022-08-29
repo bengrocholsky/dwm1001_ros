@@ -1,7 +1,7 @@
 <launch>
 
     <!--Exctract info from dwm1001 dev boards, filter them and publish them into topics-->
-    <node pkg="localizer_dwm1001" type="dwm1001_main.py" name="localizer_dwm1001" output="screen">
+    <node pkg="localizer_dwm1001" type="dwm1001_main.py" name="localizer_dwm1001" output="log" respawn="true" respawn_delay="1">
 
         <param name="serial_port_name"      value="/dev/ttyACM_dwm" /> <!-- Name of serial port -->
         <param name="serial_baud_rate"      value="115200" />  <!--Baudrate of serial port-->
