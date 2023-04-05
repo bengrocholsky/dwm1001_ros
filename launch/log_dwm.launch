@@ -3,5 +3,6 @@
   args="-O /data/current/dwm.bag --split --size=2048
 /diagnostics
 /dwm1001/anchors
+/dwm1001/tag
 "/>
 </launch>

@@ -1,4 +1,11 @@
 <launch>
   <include file="$(find localizer_dwm1001)/launch/dwm1001.launch" />
   <include file="$(find localizer_dwm1001)/launch/px4.launch" />
+
+  <node pkg="rtk_scripts" name="rtcm_receiver" type="ntrip_to_tcp.py" respawn="true" respawn_delay="2"/>
+  <node pkg="rtk_scripts" name="mavlink_router" type="mavlink_router.py" respawn="true" respawn_delay="2"/>
+  <node pkg="rtk_scripts" name="rtcm_mavlink" type="rtcm_ip_mavlink.py" respawn="true" respawn_delay="2"/>
+  <node pkg="rtk_scripts" name="gpspipe" type="gpspipe.py" respawn="true" respawn_delay="2"/>
+  <node pkg="rtk_scripts" name="log_rtcm" type="log_rtcm.py" respawn="true" respawn_delay="2"/>
+
 </launch>
